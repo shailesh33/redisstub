@@ -23,15 +23,20 @@ func respond(conn net.Conn, req *RedisRequest) {
 	case REQUEST_REDIS_COMMAND:
 		rsp := newArrayResponse()
 		rsp.Write(w)
-	case REQUEST_REDIS_MGET:
-		rsp := newErrorResponse("Storage: Too many arguments")
-		rsp.Write(w)
 	case REQUEST_REDIS_PING:
 		rsp := newStringResponse([]byte{'P', 'O', 'N', 'G'})
 		rsp.Write(w)
 	case REQUEST_REDIS_INFO:
 		rsp := newArrayResponse()
 		rsp.Write(w)
+	case REQUEST_REDIS_GET:
+		fallthrough
+	case REQUEST_REDIS_MGET:
+		fallthrough
+	default:
+		rsp := newErrorResponse("Storage: Too many arguments")
+		rsp.Write(w)
+
 	}
 }
 
