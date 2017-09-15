@@ -18,14 +18,19 @@ func init() {
 
 func respond(conn net.Conn, req *RedisRequest) {
 	w := bufio.NewWriter(conn)
+	log.Printf("Received %s", req.Name)
 	switch req.requestType {
 	case REQUEST_REDIS_COMMAND:
-		log.Printf("received command")
 		rsp := newArrayResponse()
 		rsp.Write(w)
 	case REQUEST_REDIS_MGET:
-		log.Printf("Received MGET")
 		rsp := newErrorResponse("Storage: Too many arguments")
+		rsp.Write(w)
+	case REQUEST_REDIS_PING:
+		rsp := newStringResponse([]byte{'P', 'O', 'N', 'G'})
+		rsp.Write(w)
+	case REQUEST_REDIS_INFO:
+		rsp := newArrayResponse()
 		rsp.Write(w)
 	}
 }
@@ -39,7 +44,6 @@ func redisClientConnHandler(conn net.Conn) {
 			log.Printf("Error parsing %s", err.Error())
 			return
 		}
-		log.Printf("Received %+v", req)
 		respond(conn, req)
 	}
 
